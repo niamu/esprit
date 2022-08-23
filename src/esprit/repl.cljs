@@ -14,19 +14,9 @@
 (defn- write [c o]
   (ind/indicate-eval false)
   (doto c
-     (.write (.stringify js/JSON o))
-     (.write "\0"))
+    (.write (.stringify js/JSON o))
+    (.write "\0"))
   (ind/indicate-print))
-
-(defn eval-data [data]
-  (try
-    (ind/indicate-eval true)
-    #js {:status "success"
-         :value  (js/eval data)}
-    (catch :default ex
-      #js {:status "exception"
-           :value (str ex)
-           :stacktrace (.-stack ex)})))
 
 (defn- handle-repl-connection [c]
   (.log js/console "New REPL Connection")
@@ -45,7 +35,16 @@
                (reset! buffer "")
                (cond
                  (string/starts-with? data "(function (){try{return cljs.core.pr_str")
-                 (write c (eval-data data))
+                 (write c
+                        ;; NOTE: This needs to be inlined for some reason
+                        ;; Otherwise Espruino will throw a large error and halt
+                        (try
+                          #js {:status "success"
+                               :value (js/eval data)}
+                          (catch :default ex
+                            #js {:status "exception"
+                                 :value (str ex)
+                                 :stacktrace (.-stack ex)})))
 
                  (= data ":cljs/quit")
                  (.end c)

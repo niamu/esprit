@@ -240,8 +240,12 @@
   (try
     (let [_ (set-logging-level "javax.jmdns" java.util.logging.Level/OFF)
           [bonjour-name endpoint] (if-let [endpoint-address (:endpoint-address (:options repl-env))]
-                                    ["Esprit ESP32 WROVER" {:address endpoint-address :port 53001}]
-                                    (discover-and-choose-device (:choose-first-discovered (:options repl-env)) opts))
+                                    [(str esprit-bonjour-name-prefix
+                                          "ESP32")
+                                     {:address endpoint-address :port 53001}]
+                                    (discover-and-choose-device
+                                     (:choose-first-discovered (:options repl-env))
+                                     opts))
           endpoint-address (:address endpoint)
           endpoint-port (:port endpoint)]
       (println (str "\nConnecting to " (bonjour-name->display-name bonjour-name) " ...\n"))
