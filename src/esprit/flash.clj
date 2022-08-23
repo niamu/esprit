@@ -9,7 +9,7 @@
   {"bootloader.bin" 0x1000
    "partitions_espruino.bin" 0x8000
    "espruino_esp32.bin" 0x10000
-   "main.bin" 0x320000})
+   "main.bin" 0x1A3000})
 
 (defn run-and-print [& cmd-and-args]
   (.. (doto (ProcessBuilder. cmd-and-args)
@@ -31,9 +31,9 @@
   ([bin addr]
    (if-let [port (:serial-port env)]
      (flash bin addr port)
-     (run-and-print "esptool.py" "--baud" "2000000" "write_flash" (str addr) bin)))
+     (run-and-print "esptool.py" "--baud" "921600" "write_flash" (str addr) bin)))
   ([bin addr port]
-   (run-and-print "esptool.py" "--baud" "2000000" "--port" port "write_flash" (str addr) bin)))
+   (run-and-print "esptool.py" "--baud" "921600" "--port" port "write_flash" (str addr) bin)))
 
 (defn resource-to-tmp
   "Copy a file from the classpath `resource` to a temp file and return the File obj"
